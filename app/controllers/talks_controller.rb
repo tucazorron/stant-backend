@@ -1,20 +1,14 @@
 class TalksController < ApplicationController
-    def create
-        file = params[:file]
-        imported_talks = []
-        
-        CSV.foreach(file.path) do |row|
-            title, duration = row
-            talk = Talk.new(title: title, duration: duration)
-            if talk.save
-                imported_talks << talk
-            end
-        end
-        render json: imported_talks
+    protect_from_forgery with: :null_session, only: [:upload_file]
+
+    def upload_file
+        Talk.delete_all
+        talks = Talk.get_talks(params[:file])
+        schedule = Talk.schedule_talks(talks)
+        render json: schedule
     end
 
     def index
-        talks = Talk.all
-        render json: talks
+        render json: Talk.all
     end
 end
