@@ -2,7 +2,7 @@ class Talk < ApplicationRecord
     validates :title, presence: true
     validates :duration, presence: true
 
-    def self.get_talks(file)
+    def self.handle_file(file)
         talks = []
         file_content = file.read
         lines = file_content.split("\n")
@@ -23,7 +23,7 @@ class Talk < ApplicationRecord
         talks
     end
 
-    def self.schedule_talks(talks)
+    def self.get_schedule(talks)
         schedule = []
         talks = talks.sort_by(&:duration).reverse
         talks.each do |talk|
