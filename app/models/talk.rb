@@ -1,31 +1,72 @@
 class Talk < ApplicationRecord
     validates :title, presence: true
     validates :duration, presence: true
-
+  
     def self.handle_file(file)
         talks = []
         file_content = file.read
         lines = file_content.split("\n")
         lines.each do |line|
-            last_space_index = line.rindex(' ')
-            title = line[0..last_space_index].strip
-            duration_string = line[last_space_index..-1].strip
-            if duration_string.end_with?('min')
-                duration = duration_string[0..-4].to_i
-            elsif duration_string.end_with?('lightning')
-                duration = 5
-            end
+            title, duration = parse_line(line)
             talk = Talk.new(title: title, duration: duration)
-            if talk.save
-                talks << talk
-            end
+            talk.save
+            talks << talk
         end
         talks
     end
-
+  
+    def self.parse_line(line)
+        title, _, duration_string = line.rpartition(' ')
+        duration = parse_duration(duration_string)
+        [title.strip, duration]
+    end
+  
+    def self.parse_duration(duration_string)
+        if duration_string.end_with?('min')
+            duration_string.to_i
+        elsif duration_string.end_with?('lightning')
+            5
+        else
+            0
+        end
+    end
+  
     def self.create_schedule(talks)
-        schedule = []
-        track_model = {
+        schedule = [new_track_model]
+        sorted_talks = talks.sort_by(&:duration).reverse
+        sorted_talks.each do |talk|
+            schedule, is_talk_scheduled = schedule_talk(talk, schedule)
+            schedule << new_track_model unless is_talk_scheduled
+        end
+        handle_schedule(schedule)
+    end
+  
+    def self.schedule_talk(talk, schedule)
+        is_talk_scheduled = false
+        schedule.each do |track|
+            if schedule_talk_in_track(talk, track, :morning, :morning_time_left, :next_morning_talk_time)
+                is_talk_scheduled = true
+            elsif schedule_talk_in_track(talk, track, :afternoon, :afternoon_time_left, :next_afternoon_talk_time)
+                is_talk_scheduled = true
+            end
+        end
+        [schedule, is_talk_scheduled]
+    end
+  
+    def self.schedule_talk_in_track(talk, track, time_slot, time_left_key, next_time_key)
+        return false if talk.duration > track[time_left_key]
+        track[:"#{time_slot}_schedule"] << {
+            "time": track[next_time_key],
+            "title": talk.title,
+            "duration": talk.duration
+        }
+        track[time_left_key] -= talk.duration
+        track[next_time_key] = (Time.parse(track[next_time_key]) + talk.duration * 60).strftime('%H:%M')
+        true
+    end
+  
+    def self.new_track_model
+        {
             next_morning_talk_time: '09:00',
             morning_time_left: 180,
             morning_schedule: [],
@@ -33,31 +74,20 @@ class Talk < ApplicationRecord
             afternoon_time_left: 240,
             afternoon_schedule: []
         }
-        schedule << Marshal.load(Marshal.dump(track_model))
-        sorted_talks = talks.sort_by { |t| -t["duration"] }
-        sorted_talks.each do |talk|
-            is_talk_scheduled = false
-            schedule.each do |track|
-                if talk.duration <= track[:morning_time_left]
-                    track[:morning_schedule] << {"time": track[:next_morning_talk_time], "title": talk.title, "duration": talk.duration}
-                    track[:morning_time_left] -= talk.duration
-                    track[:next_morning_talk_time] = (Time.parse(track[:next_morning_talk_time]) + talk.duration * 60).strftime('%H:%M')
-                    is_talk_scheduled = true
-                elsif talk.duration <= track[:afternoon_time_left]
-                    track[:afternoon_schedule] << {"time": track[:next_afternoon_talk_time], "title": talk.title, "duration": talk.duration}
-                    track[:afternoon_time_left] -= talk.duration
-                    track[:next_afternoon_talk_time] = (Time.parse(track[:next_afternoon_talk_time]) + talk.duration * 60).strftime('%H:%M')
-                    is_talk_scheduled = true
-                end
-            end
-            if !is_talk_scheduled
-                schedule << Marshal.load(Marshal.dump(track_model))
-                new_track = schedule.last
-                new_track[:morning_schedule] << {"time": new_track[:next_morning_talk_time], "title": talk.title, "duration": talk.duration}
-                new_track[:morning_time_left] -= talk.duration
-                new_track[:next_morning_talk_time] = (Time.parse(new_track[:next_morning_talk_time]) + talk.duration * 60).strftime('%H:%M')
-            end
-        end
-        schedule
     end
-end
+  
+    def self.handle_schedule(schedule)
+        treated_schedule = []
+        schedule.each do |track|
+            treated_track = []
+            treated_track.concat(track[:morning_schedule])
+            treated_track << { "time": '12:00', "title": 'Almoço', "duration": 60 }
+            treated_track.concat(track[:afternoon_schedule])
+            networking_time = track[:afternoon_time_left] > 60 ? '16:00' : track[:next_afternoon_talk_time]
+            treated_track << { "time": networking_time, "title": 'Evento de Networking', "duration": 60 }
+            treated_schedule << treated_track
+        end
+        treated_schedule
+    end
+  end
+  
