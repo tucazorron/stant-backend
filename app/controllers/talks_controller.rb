@@ -55,7 +55,7 @@ class TalksController < ApplicationController
 
     def schedule
         talks = Talk.all
-        schedule = Talk.get_schedule(talks)
+        schedule = Talk.create_schedule(talks)
         render json: schedule
     end
 end

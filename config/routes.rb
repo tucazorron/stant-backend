@@ -6,5 +6,5 @@ Rails.application.routes.draw do
   delete 'talks/:id', to: 'talks#destroy'
   delete 'talks', to: 'talks#destroy_all'
   post 'upload-file', to: 'talks#upload_file'
-  get 'schedule', to: 'talks#get_schedule'
+  get 'schedule', to: 'talks#schedule'
 end
