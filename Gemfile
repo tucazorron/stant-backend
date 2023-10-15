@@ -10,6 +10,8 @@ gem "sprockets-rails"
 
 gem "pg"
 
+gem 'rack-cors'
+
 gem "byebug"
 
 # Use the Puma web server [https://github.com/puma/puma]
