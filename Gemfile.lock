@@ -238,7 +238,7 @@ PLATFORMS
 
 DEPENDENCIES
   bootsnap
-  bundler (= 2.4.20)
+  bundler (= 2.3.25)
   byebug
   capybara
   debug
@@ -259,4 +259,4 @@ RUBY VERSION
    ruby 3.2.2p53
 
 BUNDLED WITH
-   2.4.20
+   2.3.25
