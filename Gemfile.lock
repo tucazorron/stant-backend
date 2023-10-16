@@ -238,7 +238,7 @@ PLATFORMS
 
 DEPENDENCIES
   bootsnap
-  bundler (= 2.3.25)
+  bundler
   byebug
   capybara
   debug
