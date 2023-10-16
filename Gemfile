@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-ruby "3.2.2"
+ruby "3.0.0"
 
 gem "bundler"
 
@@ -10,7 +10,7 @@ gem "rails", "7.1.1"
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
 
-gem 'pg'
+gem 'pg', '1.5.4'
 
 gem 'rack-cors'
 

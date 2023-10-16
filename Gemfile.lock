@@ -244,7 +244,7 @@ DEPENDENCIES
   debug
   importmap-rails
   jbuilder
-  pg
+  pg (= 1.5.4)
   puma (>= 5.0)
   rack-cors
   rails (= 7.1.1)
@@ -256,7 +256,7 @@ DEPENDENCIES
   web-console
 
 RUBY VERSION
-   ruby 3.2.2p53
+   ruby 3.0.0p0
 
 BUNDLED WITH
    2.3.25
