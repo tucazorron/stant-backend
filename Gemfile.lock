@@ -238,6 +238,7 @@ PLATFORMS
 
 DEPENDENCIES
   bootsnap
+  bundler (= 2.4.20)
   byebug
   capybara
   debug
@@ -246,7 +247,7 @@ DEPENDENCIES
   pg
   puma (>= 5.0)
   rack-cors
-  rails (~> 7.1.1)
+  rails (= 7.1.1)
   selenium-webdriver
   sprockets-rails
   stimulus-rails
