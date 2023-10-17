@@ -1,24 +1,28 @@
-# README
+# Stant - Backend
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## API em producao
 
-Things you may want to cover:
+```
+https://stant-backend-7998ec046276.herokuapp.com
+```
 
-* Ruby version
+## Subir servidor localmente
 
-* System dependencies
+```
+rails s
+```
 
-* Configuration
+## Rotas
 
-* Database creation
+- GET "/talks": listagem de palestras
+- POST "/talks": criacao de palestra
+- GET "/talks/{id}": visualizacao de palestra
+- PUT "/talks/{id}": edicao de palestra
+- DELETE "/talks/{id}": exclusao de palestra
+- DELETE "/talks": exclusao de todas as palestras
+- POST "/upload-file": upload de arquivo de palestras
+- GET "/schedule": criacao de cronograma das palestras
 
-* Database initialization
+## Alteracoes
 
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+- Alterei o modelo de gerar cronograma de palestras para um modelo mais otimizado, ordenanda as palestras por tempo descendente e sempre alocando primeiro as palestras de maior duracao. Assim, os intervalos ficam mais preenchidos e podemos ter menos tracks ao final do dia
